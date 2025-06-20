@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,16 +24,27 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity,
+            JwtFilter jwtFilter // <-- iniettato direttamente nel metodo
+    ) throws Exception {
 
-        httpSecurity.formLogin(http->http.disable());
-        httpSecurity.csrf(http->http.disable());
-        httpSecurity.sessionManagement(http->http.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.formLogin(http -> http.disable());
+        httpSecurity.csrf(http -> http.disable());
+        httpSecurity.sessionManagement(http -> http.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         httpSecurity.cors(Customizer.withDefaults());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/auth/**").permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/studenti/**").permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.POST).permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.anyRequest().denyAll());
+
+        httpSecurity.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/eventi/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/eventi/**").hasAuthority("EVENT_CREATOR")
+                .requestMatchers(HttpMethod.PUT, "/eventi/**").hasAuthority("EVENT_CREATOR")
+                .requestMatchers(HttpMethod.DELETE, "/eventi/**").hasAuthority("EVENT_CREATOR")
+                .requestMatchers("/prenotazioni/**").authenticated()
+                .anyRequest().denyAll()
+        );
+
+        httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
@@ -54,3 +66,4 @@ public class SecurityConfig {
         return source;
     }
 }
+
