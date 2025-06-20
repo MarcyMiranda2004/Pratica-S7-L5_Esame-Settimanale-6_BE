@@ -27,7 +27,7 @@ public class JwtTool {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + durata))
                 .subject(String.valueOf(user.getId()))
-                .claim("role", user.getRuolo()) // Aggiunta del ruolo
+                .claim("role", user.getRuolo())
                 .signWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes()))
                 .compact();
     }
