@@ -31,3 +31,20 @@ build/
 
 ### VS Code ###
 .vscode/
+# 🔐 File di configurazione sensibili
+.env
+application.properties
+
+# 🏗️ File generati da Maven
+/target/
+
+# 🧠 IntelliJ project files
+.idea/
+*.iml
+
+# 🗃️ Log files
+*.log
+
+# 💼 Sistema operativo
+.DS_Store
+Thumbs.db
