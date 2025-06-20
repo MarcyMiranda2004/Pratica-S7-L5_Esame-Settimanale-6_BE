@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PrenotazioneRepository extends JpaRepository<Prenotazione, Long> {
+    boolean existsByUtenteIdAndEventoId(Integer utenteId, Long eventoId);
     List<Prenotazione> findByUtenteId(Integer utenteId);
-    boolean existsByUtenteIdAndEventoId(Integer userId, Long eventoId);
 }

@@ -4,16 +4,16 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Data
 public class Evento {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String titolo;
-    @Column(length = 1000)
     private String descrizione;
     private LocalDate dataEvento;
     private String luogo;
@@ -22,7 +22,4 @@ public class Evento {
     @ManyToOne
     @JoinColumn(name = "organizzatore_id")
     private User organizzatore;
-
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.REMOVE)
-    private List<Prenotazione> prenotazioni;
 }

@@ -22,25 +22,30 @@ public class JwtTool {
     @Autowired
     private UserService userService;
 
-    public String createToken(User user){
-
-        return Jwts.builder().issuedAt(new Date()).
-                expiration(new Date(System.currentTimeMillis()+durata)).
-                subject(String.valueOf(user.getId())).
-                signWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes())).
-                compact();
+    public String createToken(User user) {
+        return Jwts.builder()
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + durata))
+                .subject(String.valueOf(user.getId()))
+                .claim("role", user.getRuolo()) // Aggiunta del ruolo
+                .signWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes()))
+                .compact();
     }
 
-    public void validateToken(String token){
-        Jwts.parser().verifyWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes())).
-                build().parse(token);
+    public void validateToken(String token) {
+        Jwts.parser().verifyWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes())).build().parse(token);
     }
 
     public User getUserFromToken(String token) throws NotFoundException {
-        int id = Integer.parseInt(Jwts.parser().verifyWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes())).
-                build().parseSignedClaims(token).getPayload().getSubject());
+        int id = Integer.parseInt(Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(chiaveSegreta.getBytes()))
+                .build().parseSignedClaims(token).getPayload().getSubject());
 
         return userService.getUser(id);
     }
 
+    public String getChiaveSegreta() {
+        return chiaveSegreta;
+    }
 }
+
