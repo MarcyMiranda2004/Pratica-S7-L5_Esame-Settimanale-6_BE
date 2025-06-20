@@ -26,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity httpSecurity,
-            JwtFilter jwtFilter // <-- iniettato direttamente nel metodo
+            JwtFilter jwtFilter
     ) throws Exception {
 
         httpSecurity.formLogin(http -> http.disable());
@@ -36,11 +36,19 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
+
+                // Eventi
                 .requestMatchers(HttpMethod.GET, "/eventi/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/eventi/**").hasAuthority("EVENT_CREATOR")
                 .requestMatchers(HttpMethod.PUT, "/eventi/**").hasAuthority("EVENT_CREATOR")
                 .requestMatchers(HttpMethod.DELETE, "/eventi/**").hasAuthority("EVENT_CREATOR")
-                .requestMatchers("/prenotazioni/**").authenticated()
+
+                // Prenotazioni
+                .requestMatchers(HttpMethod.POST, "/prenotazioni").hasAuthority("USER")
+                .requestMatchers(HttpMethod.DELETE, "/prenotazioni/**").hasAuthority("USER")
+                .requestMatchers(HttpMethod.GET, "/prenotazioni").hasAuthority("USER")
+                .requestMatchers(HttpMethod.GET, "/prenotazioni/**").hasAuthority("USER")
+
                 .anyRequest().denyAll()
         );
 
@@ -66,4 +74,3 @@ public class SecurityConfig {
         return source;
     }
 }
-
